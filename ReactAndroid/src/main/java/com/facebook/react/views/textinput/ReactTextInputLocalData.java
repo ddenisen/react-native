@@ -21,6 +21,8 @@ public final class ReactTextInputLocalData {
   private final int mMaxLines;
   private final int mInputType;
   private final int mBreakStrategy;
+  private final int mImportantForAutofill;
+  private final String[] mAutofillHints;
   private final  CharSequence mPlaceholder;
 
   public ReactTextInputLocalData(EditText editText) {
@@ -42,6 +44,14 @@ public final class ReactTextInputLocalData {
     } else {
       mBreakStrategy = 0;
     }
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      mImportantForAutofill = editText.getImportantForAutofill();
+      mAutofillHints = editText.getAutofillHints();
+    } else {
+      mImportantForAutofill = 0;
+      mAutofillHints = null;
+    }
   }
 
   public void apply(EditText editText) {
@@ -53,6 +63,11 @@ public final class ReactTextInputLocalData {
     editText.setHint(mPlaceholder);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
       editText.setBreakStrategy(mBreakStrategy);
+    }
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      editText.setImportantForAutofill(mImportantForAutofill);
+      editText.setAutofillHints(mAutofillHints);
     }
   }
 }

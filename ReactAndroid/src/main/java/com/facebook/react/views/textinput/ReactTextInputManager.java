@@ -10,6 +10,7 @@ package com.facebook.react.views.textinput;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -590,6 +591,44 @@ public class ReactTextInputManager extends BaseViewManager<ReactEditText, Layout
         KEYBOARD_TYPE_FLAGS,
         flagsToSet);
     checkPasswordType(view);
+  }
+
+  @ReactProp(name = "textContentType")
+  public void setTextContentType(ReactEditText view, @Nullable String textContentType) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      String hint = null;
+      boolean disableAutofill = false;
+
+      if ("emailAddress".equalsIgnoreCase(textContentType)) {
+        hint = View.AUTOFILL_HINT_EMAIL_ADDRESS;
+      } else if ("username".equalsIgnoreCase(textContentType)) {
+        hint = View.AUTOFILL_HINT_USERNAME;
+      } else if ("password".equalsIgnoreCase(textContentType)) {
+        hint = View.AUTOFILL_HINT_PASSWORD;
+      } else if ("name".equalsIgnoreCase(textContentType)) {
+        hint = View.AUTOFILL_HINT_NAME;
+      } else if ("fullStreetAddress".equalsIgnoreCase(textContentType)) {
+        hint = View.AUTOFILL_HINT_POSTAL_ADDRESS;
+      } else if ("postalCode".equalsIgnoreCase(textContentType)) {
+        hint = View.AUTOFILL_HINT_POSTAL_CODE;
+      } else if ("telephoneNumber".equalsIgnoreCase(textContentType)) {
+        hint = View.AUTOFILL_HINT_PHONE;
+      } else if ("creditCardNumber".equalsIgnoreCase(textContentType)) {
+        hint = View.AUTOFILL_HINT_CREDIT_CARD_NUMBER;
+      } else if ("none".equalsIgnoreCase(textContentType)) {
+        disableAutofill = true;
+      }
+
+      if (disableAutofill) {
+        view.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO);
+      } else if (hint != null) {
+        view.setAutofillHints(hint);
+        view.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_YES);
+      } else {
+        view.setAutofillHints();
+        view.setImportantForAutofill(View.IMPORTANT_FOR_ACCESSIBILITY_AUTO);
+      }
+    }
   }
 
   @ReactProp(name = "returnKeyType")
